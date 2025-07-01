@@ -5,93 +5,93 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Seed Code Generator</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
       font-family: 'Segoe UI', sans-serif;
-      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
+      height: 100vh;
       background: linear-gradient(135deg, #007bff, #6c63ff);
       color: white;
-      text-align: center;
       flex-direction: column;
+      text-align: center;
+      padding: 20px;
     }
 
     h1 {
       font-size: 28px;
-      margin-bottom: 30px;
-      animation: fadeIn 1s ease-in-out;
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 12px 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+      margin-bottom: 15px;
+    }
+
+    button {
+      font-size: 18px;
+      padding: 12px 30px;
+      background-color: #ffcc00;
+      color: #333;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #e6b800;
     }
 
     .seed-code {
-      font-size: 80px;
-      font-weight: bold;
+      margin-top: 30px;
+      font-size: 72px;
       background: white;
       color: #333;
-      padding: 40px 80px;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-      animation: popIn 0.7s ease-out;
-      transition: transform 0.3s ease;
-      user-select: all;
-    }
-
-    .seed-code:hover {
-      transform: scale(1.05);
-    }
-
-    @keyframes popIn {
-      0% {
-        transform: scale(0.7);
-        opacity: 0;
-      }
-      100% {
-        transform: scale(1);
-        opacity: 1;
-      }
+      padding: 30px 60px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      animation: fadeIn 0.6s ease;
     }
 
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
     }
   </style>
 </head>
 <body>
   <h1>Here is your <strong>SEED CODE</strong></h1>
-  <div class="seed-code" id="random-number">Loading...</div>
+  <input type="text" id="username" placeholder="Enter your username" />
+  <br />
+  <button onclick="getCode()">Get My Code</button>
+
+  <div class="seed-code" id="random-number" style="display: none;">0000</div>
 
   <script>
-    async function generateNumber() {
-      try {
-        const response = await fetch('/random');
-        const data = await response.json();
-        if (data.number) {
-          const el = document.getElementById('random-number');
-          el.textContent = data.number;
-        } else {
-          document.getElementById('random-number').textContent = 'Error';
-        }
-      } catch (err) {
-        console.error(err);
-        document.getElementById('random-number').textContent = 'Error';
+    async function getCode() {
+      const username = document.getElementById("username").value.trim();
+      if (!username) {
+        alert("Please enter your username!");
+        return;
+      }
+
+      const response = await fetch(`/random?user=${encodeURIComponent(username)}`);
+      const data = await response.json();
+
+      const codeBox = document.getElementById("random-number");
+      if (data.number) {
+        codeBox.textContent = data.number;
+        codeBox.style.display = "block";
+      } else {
+        codeBox.textContent = "Error";
+        codeBox.style.display = "block";
       }
     }
-
-    // Auto-load on page open
-    generateNumber();
   </script>
 </body>
 </html>
