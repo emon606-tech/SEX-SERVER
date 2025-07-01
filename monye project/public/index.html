@@ -2,28 +2,76 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Random 4-Digit Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seed Code Generator</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 100px;
-      background-color: #f2f2f2;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    .number {
-      font-size: 72px;
-      color: #333;
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #007bff, #6c63ff);
+      color: white;
+      text-align: center;
+      flex-direction: column;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 30px;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .seed-code {
+      font-size: 80px;
+      font-weight: bold;
       background: white;
-      padding: 30px 60px;
-      border-radius: 16px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-      display: inline-block;
+      color: #333;
+      padding: 40px 80px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      animation: popIn 0.7s ease-out;
+      transition: transform 0.3s ease;
       user-select: all;
+    }
+
+    .seed-code:hover {
+      transform: scale(1.05);
+    }
+
+    @keyframes popIn {
+      0% {
+        transform: scale(0.7);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
 <body>
-  <div class="number" id="random-number">Loading...</div>
+  <h1>Here is your <strong>SEED CODE</strong></h1>
+  <div class="seed-code" id="random-number">Loading...</div>
 
   <script>
     async function generateNumber() {
@@ -31,7 +79,8 @@
         const response = await fetch('/random');
         const data = await response.json();
         if (data.number) {
-          document.getElementById('random-number').textContent = data.number;
+          const el = document.getElementById('random-number');
+          el.textContent = data.number;
         } else {
           document.getElementById('random-number').textContent = 'Error';
         }
@@ -41,7 +90,8 @@
       }
     }
 
-    generateNumber(); // auto-load number on page load
+    // Auto-load on page open
+    generateNumber();
   </script>
 </body>
 </html>
