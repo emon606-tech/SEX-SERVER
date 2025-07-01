@@ -7,8 +7,8 @@ const PORT = process.env.PORT || 3000;
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN; // Set in Railway environment variables!
 const REPO_OWNER = "emon606-tech";             // Your GitHub username/org
-const REPO_NAME = "random-number-server";      // Your GitHub repo name
-const FILE_PATH = "random.txt";                 // Path in repo to save the number
+const REPO_NAME = "CCX";      // Your GitHub repo name
+const FILE_PATH = "CODE.txt";                 // Path in repo to save the number
 
 // Serve frontend static files from 'public' folder
 app.use(express.static(path.join(__dirname, 'public')));
@@ -44,7 +44,7 @@ app.get('/random', async (req, res) => {
       content: contentEncoded,
       committer: {
         name: "Random Number Bot",
-        email: "your-email@example.com"
+        email: "diytouch606@gmail.com"
       }
     };
     if (sha) {
