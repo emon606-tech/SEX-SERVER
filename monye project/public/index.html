@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Random 4-Digit Number</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 100px;
+      background-color: #f9f9f9;
+    }
+    .number {
+      font-size: 80px;
+      color: #333;
+      background: #fff;
+      display: inline-block;
+      padding: 20px 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      margin-bottom: 20px;
+      user-select: all;
+    }
+    button {
+      font-size: 20px;
+      padding: 10px 25px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      background-color: #007bff;
+      color: white;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="number" id="number">Loading...</div>
+  <br />
+  <button onclick="fetchNumber()">Generate New Number</button>
+
+  <script>
+    async function fetchNumber() {
+      try {
+        const res = await fetch('/random');
+        const data = await res.json();
+        if(data.number) {
+          document.getElementById('number').textContent = data.number;
+        } else {
+          document.getElementById('number').textContent = 'Error';
+        }
+      } catch (error) {
+        document.getElementById('number').textContent = 'Error';
+        console.error(error);
+      }
+    }
+
+    // Load number on page load
+    fetchNumber();
+  </script>
+</body>
+</html>
