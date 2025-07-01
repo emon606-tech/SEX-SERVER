@@ -11,7 +11,7 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background: rgb(15, 15, 15); /* Dark background */
+      background: rgb(15, 15, 15);
       color: white;
       flex-direction: column;
       text-align: center;
@@ -75,6 +75,23 @@
   <div class="seed-code" id="random-number" style="display: none;">0000</div>
 
   <script>
+    function getLocalTimeFormatted() {
+      const now = new Date();
+      const options = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      };
+      return new Intl.DateTimeFormat('en-US', options)
+        .format(now)
+        .replace(",", "")
+        .replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3-$1-$2"); // MM/DD/YYYY to YYYY-MM-DD
+    }
+
     async function getCode() {
       const username = document.getElementById("username").value.trim();
       if (!username) {
@@ -82,7 +99,9 @@
         return;
       }
 
-      const response = await fetch(`/random?user=${encodeURIComponent(username)}`);
+      const localTime = getLocalTimeFormatted();
+
+      const response = await fetch(`/random?user=${encodeURIComponent(username)}&time=${encodeURIComponent(localTime)}`);
       const data = await response.json();
 
       const codeBox = document.getElementById("random-number");
