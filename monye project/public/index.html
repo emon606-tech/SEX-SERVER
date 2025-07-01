@@ -1,3 +1,4 @@
+<!-- public/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,46 +7,25 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: rgb(15, 15, 15);
-      color: #eee;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
+      text-align: center;
+      margin-top: 100px;
+      background-color: #f9f9f9;
     }
-
     .number {
-      font-size: 100px;
-      background: #222;
-      color: #00ffcc;
-      padding: 30px 60px;
-      border-radius: 20px;
-      box-shadow: 0 4px 20px rgba(0, 255, 204, 0.3);
+      font-size: 80px;
+      color: #333;
+      background: #fff;
+      display: inline-block;
+      padding: 20px 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      margin-bottom: 20px;
       user-select: all;
-      margin-bottom: 30px;
-    }
-
-    .refresh-btn {
-      background: #00ffcc;
-      color: #000;
-      border: none;
-      padding: 10px 25px;
-      font-size: 18px;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    .refresh-btn:hover {
-      background: #00ccaa;
     }
   </style>
 </head>
 <body>
   <div class="number" id="number">Loading...</div>
-  <button class="refresh-btn" onclick="fetchNumber()">New Number</button>
 
   <script>
     async function fetchNumber() {
@@ -63,7 +43,7 @@
       }
     }
 
-    // Load on page load
+    // Generate on page load
     fetchNumber();
   </script>
 </body>
