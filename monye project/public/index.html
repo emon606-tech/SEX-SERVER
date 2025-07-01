@@ -1,50 +1,47 @@
-<!-- public/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Random 4-Digit Number</title>
+  <title>Random 4-Digit Generator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
       margin-top: 100px;
-      background-color: #f9f9f9;
+      background-color: #f2f2f2;
     }
     .number {
-      font-size: 80px;
+      font-size: 72px;
       color: #333;
-      background: #fff;
+      background: white;
+      padding: 30px 60px;
+      border-radius: 16px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
       display: inline-block;
-      padding: 20px 40px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-      margin-bottom: 20px;
       user-select: all;
     }
   </style>
 </head>
 <body>
-  <div class="number" id="number">Loading...</div>
+  <div class="number" id="random-number">Loading...</div>
 
   <script>
-    async function fetchNumber() {
+    async function generateNumber() {
       try {
-        const res = await fetch('/random');
-        const data = await res.json();
+        const response = await fetch('/random');
+        const data = await response.json();
         if (data.number) {
-          document.getElementById('number').textContent = data.number;
+          document.getElementById('random-number').textContent = data.number;
         } else {
-          document.getElementById('number').textContent = 'Error';
+          document.getElementById('random-number').textContent = 'Error';
         }
-      } catch (error) {
-        document.getElementById('number').textContent = 'Error';
-        console.error(error);
+      } catch (err) {
+        console.error(err);
+        document.getElementById('random-number').textContent = 'Error';
       }
     }
 
-    // Generate on page load
-    fetchNumber();
+    generateNumber(); // auto-load number on page load
   </script>
 </body>
 </html>
