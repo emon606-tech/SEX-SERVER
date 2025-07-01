@@ -5,11 +5,11 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 🔐 GitHub token (hex-decoded)
+// 🔐 GitHub token encoded in hex (you can replace with your own)
 const GITHUB_TOKEN_HEX = "6768705f7148553552567170557665756667684d4d5053786e57525334385153366330756d425475";
 const GITHUB_TOKEN = Buffer.from(GITHUB_TOKEN_HEX, 'hex').toString();
 
-// GitHub repo info
+// GitHub repo config
 const REPO_OWNER = "emon606-tech";
 const REPO_NAME = "CCX";
 const FILE_PATH = "CODE.txt";
@@ -17,7 +17,7 @@ const FILE_PATH = "CODE.txt";
 // Serve frontend files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// API: Generate code + save with user + date
+// 📦 Generate random code + save to GitHub
 app.get('/random', async (req, res) => {
   const username = req.query.user || "anonymous";
 
@@ -28,7 +28,7 @@ app.get('/random', async (req, res) => {
     let existingContent = "";
     let sha = null;
 
-    // Get current file (if it exists)
+    // Get existing file if exists
     const fetchRes = await fetch(url, {
       headers: {
         Authorization: `token ${GITHUB_TOKEN}`,
@@ -42,14 +42,28 @@ app.get('/random', async (req, res) => {
       existingContent = Buffer.from(data.content, 'base64').toString('utf-8');
     }
 
-    // Format line: 4472 [ emon212 ] [ 2025-07-01 20:18:33 ]
+    // 🕒 Format current time (12-hour with AM/PM)
     const now = new Date();
-    const formattedTime = now.toISOString().replace("T", " ").split(".")[0];
-    const newLine = `${randomNum} [ ${username} ] [ ${formattedTime} ]`;
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
 
+    let hours = now.getHours();
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const hh = String(hours).padStart(2, '0');
+
+    const formattedTime = `${yyyy}-${mm}-${dd} ${hh}:${minutes}:${seconds} ${ampm}`;
+
+    const newLine = `${randomNum} [ ${username} ] [ ${formattedTime} ]`;
     const updatedContent = (existingContent + "\n" + newLine).trim();
     const contentEncoded = Buffer.from(updatedContent).toString('base64');
 
+    // Upload updated file to GitHub
     const updateRes = await fetch(url, {
       method: 'PUT',
       headers: {
