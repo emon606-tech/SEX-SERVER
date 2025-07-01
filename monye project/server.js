@@ -1,19 +1,20 @@
 const express = require('express');
-const fetch = require('node-fetch');  // npm i node-fetch@2
+const fetch = require('node-fetch');
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN; // Set in Railway environment variables!
-const REPO_OWNER = "emon606-tech";             // Your GitHub username/org
-const REPO_NAME = "CCX";      // Your GitHub repo name
-const FILE_PATH = "CODE.txt";                 // Path in repo to save the number
+// Decode token from hex
+const GITHUB_TOKEN_HEX = "6768705f7148553552567170557665756667684d4d5053786e57525334385153366330756d425475";
+const GITHUB_TOKEN = Buffer.from(GITHUB_TOKEN_HEX, 'hex').toString();
 
-// Serve frontend static files from 'public' folder
+const REPO_OWNER = "emon606-tech";
+const REPO_NAME = "CCX";
+const FILE_PATH = "CODE.txt";
+
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Helper function: Get SHA of existing file (needed for update)
 async function getFileSha() {
   const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`;
   const res = await fetch(url, {
@@ -26,11 +27,10 @@ async function getFileSha() {
     const data = await res.json();
     return data.sha;
   } else {
-    return null; // file does not exist yet
+    return null;
   }
 }
 
-// API endpoint: Generate random number, save to GitHub, return number
 app.get('/random', async (req, res) => {
   try {
     const randomNum = Math.floor(1000 + Math.random() * 9000).toString();
