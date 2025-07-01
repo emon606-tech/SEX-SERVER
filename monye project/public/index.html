@@ -21,32 +21,17 @@
       margin-bottom: 20px;
       user-select: all;
     }
-    button {
-      font-size: 20px;
-      padding: 10px 25px;
-      cursor: pointer;
-      border: none;
-      border-radius: 8px;
-      background-color: #007bff;
-      color: white;
-      transition: background-color 0.3s;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
   </style>
 </head>
 <body>
   <div class="number" id="number">Loading...</div>
-  <br />
-  <button onclick="fetchNumber()">Generate New Number</button>
 
   <script>
     async function fetchNumber() {
       try {
         const res = await fetch('/random');
         const data = await res.json();
-        if(data.number) {
+        if (data.number) {
           document.getElementById('number').textContent = data.number;
         } else {
           document.getElementById('number').textContent = 'Error';
