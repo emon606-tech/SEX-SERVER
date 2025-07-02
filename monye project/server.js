@@ -11,8 +11,8 @@ const GITHUB_TOKEN = Buffer.from(GITHUB_TOKEN_HEX, 'hex').toString();
 
 // GitHub Repo Info
 const REPO_OWNER = "emon606-tech";
-const REPO_NAME = "CCX";
-const FILE_PATH = "CODE.txt";
+const REPO_NAME = "usr";
+const FILE_PATH = "usr.txt";
 
 // Serve static files from public/
 app.use(express.static(path.join(__dirname, 'public')));
