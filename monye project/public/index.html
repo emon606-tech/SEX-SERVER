@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Seed Code Generator</title>
   <style>
     body {
@@ -61,8 +61,14 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
     }
   </style>
 </head>
@@ -101,16 +107,20 @@
 
       const localTime = getLocalTimeFormatted();
 
-      const response = await fetch(`/random?user=${encodeURIComponent(username)}&time=${encodeURIComponent(localTime)}`);
-      const data = await response.json();
+      try {
+        const response = await fetch(`/random?user=${encodeURIComponent(username)}&time=${encodeURIComponent(localTime)}`);
+        const data = await response.json();
 
-      const codeBox = document.getElementById("random-number");
-      if (data.number) {
-        codeBox.textContent = data.number;
-        codeBox.style.display = "block";
-      } else {
-        codeBox.textContent = "Error: " + (data.error || "Unknown error");
-        codeBox.style.display = "block";
+        const codeBox = document.getElementById("random-number");
+        if (data.number) {
+          codeBox.textContent = data.number;
+          codeBox.style.display = "block";
+        } else {
+          codeBox.textContent = "Error: " + (data.error || "Unknown error");
+          codeBox.style.display = "block";
+        }
+      } catch (err) {
+        alert("Failed to fetch code. Try again later.");
       }
     }
   </script>
