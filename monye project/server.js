@@ -5,7 +5,12 @@ const admin = require('firebase-admin');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Initialize Firebase Admin using environment variable
+// Load Firebase credentials from Railway environment variable
+if (!process.env.FIREBASE_CONFIG) {
+  console.error("❌ FIREBASE_CONFIG environment variable not set!");
+  process.exit(1);
+}
+
 const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
 
 admin.initializeApp({
@@ -15,15 +20,15 @@ admin.initializeApp({
 
 const db = admin.database();
 
-// Serve static files (HTML, CSS, JS)
+// Serve static files from 'public' folder
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Route to generate and store random code
 app.get('/random', async (req, res) => {
   const username = req.query.user || "anonymous";
   const localTime = req.query.time || "UNKNOWN_TIME";
 
   try {
+    // Generate a 4-digit random code as a string
     const randomNum = Math.floor(1000 + Math.random() * 9000).toString();
     const ref = db.ref(`codes/${randomNum}`);
 
@@ -37,11 +42,11 @@ app.get('/random', async (req, res) => {
 
     res.json({ number: randomNum });
   } catch (err) {
-    console.error(err);
+    console.error("Server error:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ Firebase server running on port ${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
 });
