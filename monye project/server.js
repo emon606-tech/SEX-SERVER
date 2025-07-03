@@ -1,11 +1,12 @@
 const express = require('express');
 const path = require('path');
 const admin = require('firebase-admin');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Load Firebase Admin SDK
-const serviceAccount = require('./firebase-key.json');
+// Initialize Firebase Admin using environment variable
+const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -14,8 +15,10 @@ admin.initializeApp({
 
 const db = admin.database();
 
+// Serve static files (HTML, CSS, JS)
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Route to generate and store random code
 app.get('/random', async (req, res) => {
   const username = req.query.user || "anonymous";
   const localTime = req.query.time || "UNKNOWN_TIME";
