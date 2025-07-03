@@ -1,83 +1,44 @@
 const express = require('express');
-const fetch = require('node-fetch'); // npm install node-fetch@2
 const path = require('path');
-
+const admin = require('firebase-admin');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 🔐 GitHub Token (hex encoded)
-const GITHUB_TOKEN_HEX = "6768705f734554484a5a59467a766778797650366373394f654b756757495762676e314f6b525435";
-const GITHUB_TOKEN = Buffer.from(GITHUB_TOKEN_HEX, 'hex').toString();
+// Load Firebase Admin SDK
+const serviceAccount = require('./firebase-key.json');
 
-// GitHub Repo Info
-const REPO_OWNER = "emon606-tech";
-const REPO_NAME = "usr";
-const FILE_PATH = "usr.txt";
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: 'https://missionpay-78730-default-rtdb.firebaseio.com/'
+});
 
-// Serve static files from public/
+const db = admin.database();
+
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Main route
 app.get('/random', async (req, res) => {
   const username = req.query.user || "anonymous";
   const localTime = req.query.time || "UNKNOWN_TIME";
 
   try {
     const randomNum = Math.floor(1000 + Math.random() * 9000).toString();
-    const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`;
+    const ref = db.ref(`codes/${randomNum}`);
 
-    let existingContent = "";
-    let sha = null;
-
-    // Fetch current CODE.txt
-    const fetchRes = await fetch(url, {
-      headers: {
-        Authorization: `token ${GITHUB_TOKEN}`,
-        Accept: "application/vnd.github.v3+json"
-      }
-    });
-
-    if (fetchRes.status === 200) {
-      const data = await fetchRes.json();
-      sha = data.sha;
-      existingContent = Buffer.from(data.content, 'base64').toString('utf-8');
+    const snapshot = await ref.once('value');
+    if (snapshot.exists()) {
+      return res.status(400).json({ error: "Code already used. Try again." });
     }
 
-    const newLine = `${randomNum} [ ${username} ] [ ${localTime} ]`;
-    const updatedContent = (existingContent + "\n" + newLine).trim();
-    const contentEncoded = Buffer.from(updatedContent).toString('base64');
-
-    // Update GitHub file
-    const updateRes = await fetch(url, {
-      method: 'PUT',
-      headers: {
-        Authorization: `token ${GITHUB_TOKEN}`,
-        Accept: "application/vnd.github.v3+json"
-      },
-      body: JSON.stringify({
-        message: `Add ${randomNum} for ${username}`,
-        content: contentEncoded,
-        sha: sha,
-        committer: {
-          name: "Random Number Bot",
-          email: "diytouch606@gmail.com"
-        }
-      })
-    });
-
-    if (!updateRes.ok) {
-      const errData = await updateRes.text();
-      console.error("GitHub API error:", errData);
-      return res.status(500).json({ error: "Failed to save number to GitHub" });
-    }
+    const codeData = `[ ${username} ] [ ${localTime} ]`;
+    await ref.set(codeData);
 
     res.json({ number: randomNum });
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`✅ Firebase server running on port ${PORT}`);
 });
