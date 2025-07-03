@@ -109,7 +109,7 @@
         codeBox.textContent = data.number;
         codeBox.style.display = "block";
       } else {
-        codeBox.textContent = "Error";
+        codeBox.textContent = "Error: " + (data.error || "Unknown error");
         codeBox.style.display = "block";
       }
     }
