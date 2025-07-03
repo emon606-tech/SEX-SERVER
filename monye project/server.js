@@ -3,7 +3,7 @@ const path = require('path');
 const admin = require('firebase-admin');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 // Load Firebase credentials from environment variable
 if (!process.env.FIREBASE_CONFIG) {
