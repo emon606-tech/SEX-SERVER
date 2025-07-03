@@ -5,7 +5,7 @@ const admin = require('firebase-admin');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Load Firebase credentials from Railway environment variable
+// Load Firebase credentials from environment variable
 if (!process.env.FIREBASE_CONFIG) {
   console.error("❌ FIREBASE_CONFIG environment variable not set!");
   process.exit(1);
@@ -28,21 +28,24 @@ app.get('/random', async (req, res) => {
   const localTime = req.query.time || "UNKNOWN_TIME";
 
   try {
-    // Generate a 4-digit random code as a string
+    // Generate a 4-digit random code as string
     const randomNum = Math.floor(1000 + Math.random() * 9000).toString();
-    const ref = db.ref(`codes/${randomNum}`);
 
+    // Check if code already exists to avoid duplicates (optional)
+    const ref = db.ref(`codes/${randomNum}`);
     const snapshot = await ref.once('value');
+
     if (snapshot.exists()) {
       return res.status(400).json({ error: "Code already used. Try again." });
     }
 
+    // Save username and time with code
     const codeData = `[ ${username} ] [ ${localTime} ]`;
     await ref.set(codeData);
 
     res.json({ number: randomNum });
-  } catch (err) {
-    console.error("Server error:", err);
+  } catch (error) {
+    console.error("Server error:", error);
     res.status(500).json({ error: "Server error" });
   }
 });
