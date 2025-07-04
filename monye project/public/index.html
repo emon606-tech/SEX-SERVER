@@ -3,126 +3,57 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Seed Code Generator</title>
+  <title>Mission Code</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: rgb(15, 15, 15);
+      background: #111;
       color: white;
-      flex-direction: column;
+      font-family: sans-serif;
       text-align: center;
-      padding: 20px;
+      padding: 50px;
     }
-
-    h1 {
-      font-size: 28px;
-      margin-bottom: 20px;
-    }
-
-    input {
-      padding: 12px 20px;
-      font-size: 18px;
-      border: none;
-      border-radius: 8px;
-      outline: none;
-      margin-bottom: 15px;
-      background-color: #fff;
-      color: #333;
-    }
-
-    button {
-      font-size: 18px;
-      padding: 12px 30px;
-      background-color: #ffcc00;
-      color: #333;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      background-color: #e6b800;
-    }
-
-    .seed-code {
-      margin-top: 30px;
-      font-size: 72px;
+    .code-box {
+      font-size: 64px;
       background: white;
       color: #333;
-      padding: 30px 60px;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-      animation: fadeIn 0.6s ease;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: scale(0.9);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
+      padding: 30px;
+      border-radius: 12px;
+      display: inline-block;
+      margin-top: 40px;
     }
   </style>
 </head>
 <body>
-  <h1>Here is your <strong>SEED CODE</strong></h1>
-  <input type="text" id="username" placeholder="Enter your username" />
-  <br />
-  <button onclick="getCode()">Get My Code</button>
-
-  <div class="seed-code" id="random-number" style="display: none;">0000</div>
+  <h1>🎯 Your Mission Code</h1>
+  <p>Copy and paste this code into your app to verify your mission completion.</p>
+  <div class="code-box" id="code">Loading...</div>
 
   <script>
-    function getLocalTimeFormatted() {
-      const now = new Date();
-      const options = {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true
-      };
-      return new Intl.DateTimeFormat('en-US', options)
-        .format(now)
-        .replace(",", "")
-        .replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3-$1-$2"); // MM/DD/YYYY to YYYY-MM-DD
-    }
+    async function loadCode() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const user = urlParams.get('user');
+      const mission = urlParams.get('mission');
 
-    async function getCode() {
-      const username = document.getElementById("username").value.trim();
-      if (!username) {
-        alert("Please enter your username!");
+      if (!user || !mission) {
+        document.getElementById('code').textContent = "Invalid link!";
         return;
       }
 
-      const localTime = getLocalTimeFormatted();
-
       try {
-        const response = await fetch(`/random?user=${encodeURIComponent(username)}&time=${encodeURIComponent(localTime)}`);
-        const data = await response.json();
+        const res = await fetch(`/random?user=${user}&mission=${mission}`);
+        const data = await res.json();
 
-        const codeBox = document.getElementById("random-number");
         if (data.number) {
-          codeBox.textContent = data.number;
-          codeBox.style.display = "block";
+          document.getElementById('code').textContent = data.number;
         } else {
-          codeBox.textContent = "Error: " + (data.error || "Unknown error");
-          codeBox.style.display = "block";
+          document.getElementById('code').textContent = "Error!";
         }
-      } catch (err) {
-        alert("Failed to fetch code. Try again later.");
+      } catch (e) {
+        document.getElementById('code').textContent = "Connection error.";
       }
     }
+
+    loadCode();
   </script>
 </body>
 </html>
