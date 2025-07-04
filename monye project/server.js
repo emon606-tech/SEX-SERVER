@@ -1,38 +1,25 @@
-const crypto = require('crypto');
+const express = require('express');
+const admin = require('firebase-admin');
 
-app.get('/random', async (req, res) => {
-  const username = req.query.user;
-  const mission = parseInt(req.query.mission, 10);
+const app = express();
+const PORT = process.env.PORT || 8080;
 
-  if (!username || !mission || mission < 1 || mission > 40) {
-    return res.status(400).json({ error: 'Invalid user or mission' });
-  }
+try {
+  const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
 
-  const code = generate4DigitCode();
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: 'https://missionpay-78730-default-rtdb.firebaseio.com/'
+  });
+} catch (err) {
+  console.error("Firebase init error:", err);
+  process.exit(1);
+}
 
-  // Generate a unique session token (random string)
-  const sessionToken = crypto.randomBytes(16).toString('hex');
+app.get('/', (req, res) => {
+  res.send('Server is running!');
+});
 
-  const codeData = {
-    code,
-    username,
-    mission,
-    used: false,
-    sessionToken,         // store session token here
-    createdAt: new Date().toISOString()
-  };
-
-  try {
-    const newCodeRef = db.ref('codes').push();
-    await newCodeRef.set(codeData);
-
-    // Return both code and session token to client
-    res.json({
-      code,
-      sessionToken,
-    });
-  } catch (err) {
-    console.error("Error saving code:", err);
-    res.status(500).json({ error: "Failed to generate code" });
-  }
+app.listen(PORT, () => {
+  console.log(Server started on port ${PORT});
 });
