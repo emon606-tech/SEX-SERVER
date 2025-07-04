@@ -1,13 +1,12 @@
 const express = require('express');
 const admin = require('firebase-admin');
+const cors = require('cors');
+
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// Enable CORS and JSON parsing
-app.use(express.json());
-app.use(require('cors')());
+app.use(cors()); // Enable CORS for frontend calls
 
-// Initialize Firebase Admin SDK
 try {
   const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
 
@@ -20,41 +19,55 @@ try {
   process.exit(1);
 }
 
-// Simple root route
-app.get('/', (req, res) => {
-  res.send('Server is running!');
-});
+const db = admin.database();
 
-// Utility to generate a random 4-digit code
-function generateCode() {
+// Helper function to generate 4-digit random code as string
+function generate4DigitCode() {
   return Math.floor(1000 + Math.random() * 9000).toString();
 }
 
-// Route to get random code
+// Endpoint to generate a code for a user and mission
+// Example call: /random?user=Emon12&mission=2
 app.get('/random', async (req, res) => {
-  const { user, time, mission } = req.query;
+  const username = req.query.user;
+  const mission = parseInt(req.query.mission, 10);
 
-  if (!user || !time || !mission) {
-    return res.status(400).json({ error: 'Missing parameters (user, time, mission)' });
+  if (!username || !mission || mission < 1 || mission > 40) {
+    return res.status(400).json({ error: 'Invalid user or mission' });
   }
 
-  const code = generateCode();
+  // Generate new 4-digit code
+  const code = generate4DigitCode();
+
+  // Prepare code object
+  const codeData = {
+    code: code,
+    username: username,
+    mission: mission,
+    used: false,
+    createdAt: new Date().toISOString()
+  };
 
   try {
-    // Store code entry in Firebase
-    await admin.database().ref('codes').push({
-      username: user,
-      time: time,
+    // Store code in Firebase under "codes"
+    const newCodeRef = db.ref('codes').push();
+    await newCodeRef.set(codeData);
+
+    // Return the generated code info to client
+    res.json({
       code: code,
-      mission: parseInt(mission),  // ✅ Store mission as number
+      username: username,
+      mission: mission,
       used: false
     });
-
-    return res.json({ number: code });
   } catch (err) {
     console.error("Error saving code:", err);
-    return res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: "Failed to generate code" });
   }
+});
+
+app.get('/', (req, res) => {
+  res.send('Server is running!');
 });
 
 app.listen(PORT, () => {
