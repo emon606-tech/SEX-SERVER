@@ -105,16 +105,25 @@
         return;
       }
 
+      const now = Date.now();
+      const lastRequestTime = localStorage.getItem("lastCodeRequest");
+
+      if (lastRequestTime && now - parseInt(lastRequestTime) < 60000) {
+        alert("⏳ Please wait at least 1 minute before generating another code.");
+        return;
+      }
+
       const localTime = getLocalTimeFormatted();
 
       try {
-        const response = await fetch(/random?user=${encodeURIComponent(username)}&time=${encodeURIComponent(localTime)});
+        const response = await fetch(`/random?user=${encodeURIComponent(username)}&time=${encodeURIComponent(localTime)}`);
         const data = await response.json();
 
         const codeBox = document.getElementById("random-number");
         if (data.number) {
           codeBox.textContent = data.number;
           codeBox.style.display = "block";
+          localStorage.setItem("lastCodeRequest", now.toString());
         } else {
           codeBox.textContent = "Error: " + (data.error || "Unknown error");
           codeBox.style.display = "block";
